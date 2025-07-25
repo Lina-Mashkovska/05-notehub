@@ -2,6 +2,7 @@ import axios from "axios";
 import type { Note, NewNote } from "../types/note";
 
 const myKey = import.meta.env.VITE_NOTEHUB_TOKEN;
+console.log("TOKEN:", myKey);
 
 axios.defaults.baseURL = "https://notehub-public.goit.study/api";
 axios.defaults.headers.common["Authorization"] = `Bearer ${myKey}`;
@@ -13,7 +14,7 @@ export interface FetchNotesParams {
 }
 
 export interface FetchNotesResponse {
-  results: Note[];
+  notes: Note[];
   totalPages: number;
 }
 
