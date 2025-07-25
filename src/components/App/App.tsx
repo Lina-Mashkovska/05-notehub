@@ -1,14 +1,11 @@
-
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { useDebounce } from "use-debounce";
-import ReactPaginate from "react-paginate";
 import { createPortal } from "react-dom";
 import css from "./App.module.css";
 
 import { fetchNotes } from "../../services/noteService";
-import type { Note } from "../../types/note";
-
+import type { FetchNotesResponse } from "../../services/noteService"; 
 import SearchBox from "../SearchBox/SearchBox";
 import NoteList from "../NoteList/NoteList";
 import Pagination from "../Pagination/Pagination";
@@ -19,17 +16,16 @@ export default function App() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
-
   const [debouncedSearch] = useDebounce(search, 300);
 
   const {
     data,
     isLoading,
     isError,
-  } = useQuery({
+  } = useQuery<FetchNotesResponse>({ 
     queryKey: ["notes", page, debouncedSearch],
     queryFn: () => fetchNotes({ page, perPage: 12, search: debouncedSearch }),
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
   });
 
   const notes = data?.results || [];
@@ -43,7 +39,11 @@ export default function App() {
       <header className={css.toolbar}>
         <SearchBox value={search} onChange={setSearch} />
         {totalPages > 1 && (
-          <Pagination pageCount={totalPages} onPageChange={setPage} currentPage={page} />
+          <Pagination
+            pageCount={totalPages}
+            onPageChange={setPage}
+            currentPage={page}
+          />
         )}
         <button className={css.button} onClick={openModal}>
           Create note +
@@ -64,3 +64,4 @@ export default function App() {
     </div>
   );
 }
+
